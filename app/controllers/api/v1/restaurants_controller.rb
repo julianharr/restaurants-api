@@ -1,6 +1,7 @@
 class Api::V1::RestaurantsController < Api::V1::BaseController
+  # This line helps the gem extract information from the header and authenticates the User
   acts_as_token_authentication_handler_for User, except: [:index, :show]
-  before_action :set_restaurant, only: [:show, :update]
+  before_action :set_restaurant, only: [:show, :update, :destroy]
 
   def index
     @restaurants = policy_scope(Restaurant)
@@ -9,12 +10,28 @@ class Api::V1::RestaurantsController < Api::V1::BaseController
   def show
   end
 
+  def create
+    @restaurant = Restaurant.new(restaurant_params)
+    @restaurant.user = current_user
+    authorize @restaurant
+    if @restaurant.save
+      render :show, status: :created
+    else
+      render_error
+    end
+  end
+
   def update
     if @restaurant.update(restaurant_params)
       render :show
     else
       render_error
     end
+  end
+
+  def destroy
+    @restaurant.destroy
+    head :no_content # No need to make a 'destroy.json.builder' view
   end
 
   private
