@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   # Nest v1 within api so that your route looks like: api_vi_restaurants
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      resources :restaurants, only: [ :index, :show ]
+      resources :restaurants, only: [ :index, :show, :update ]
     end
   end
 end
